@@ -123,8 +123,9 @@ def generate_screensaver_template(screen_size: Tuple[int, int]):
     return screensaver.convert('RGBA')
 
 
-def add_images_to_screensaver(screensaver_template, cover_images, header_size: int = 0):
+def add_images_to_screensaver(screensaver_template, cover_images, header_size: int = 0, full_screen: bool = False):
     """
+    :param full_screen: If True, some books will be cut off for a full screen. Otherwise, there will be half-empty rows.
     :param screensaver_template: The base template image of the screensaver.
     :param cover_images: A list of cover images to be added to the screensaver.
     :param header_size: The height of the header area of the screensaver. Defaults to 0.
@@ -137,6 +138,8 @@ def add_images_to_screensaver(screensaver_template, cover_images, header_size: i
     # Calculate the number of columns and rows
     columns = math.ceil(math.sqrt(total_images))
     rows = math.ceil(total_images / columns)
+    if full_screen:
+        rows = math.floor(total_images / columns)
     # Calculate the width and height of each cell
     cell_width = width // columns
     cell_height = height // rows
