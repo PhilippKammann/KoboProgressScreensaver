@@ -4,7 +4,7 @@ import os
 import sqlite3
 from typing import Optional, List, Tuple
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageDraw, ImageFont
 import wmi
 
 
@@ -123,6 +123,48 @@ def generate_screensaver_template(screen_size: Tuple[int, int]):
     return screensaver.convert('RGBA')
 
 
+def calculate_font_size(text, image_size, font_name='arial.ttf'):
+    # Open a dummy image to calculate font size
+    dummy_image = Image.new("RGB", image_size, (255, 255, 255))
+    dummy_draw = ImageDraw.Draw(dummy_image)
+
+    # Determine the maximum font size that fits the image
+    font_size = 1
+    font = ImageFont.truetype(font_name, font_size)
+    text_width = dummy_draw.textlength(text, font=font)
+    while text_width < image_size[0]:
+        font_size += 1
+        font = ImageFont.truetype(font_name, font_size)
+        text_width = dummy_draw.textlength(text, font=font)
+
+    # Decrease font size until it fits
+    font_size -= 1
+
+    return font_size
+
+
+def add_label(screensaver, coordinates):
+    """
+    Adds a label to the bottom right corner of the screensaver.
+    :param screensaver: The screensaver image to add the label to.
+    :param coordinates: The coordinates of the bottom right corner of the screensaver.
+    :return: An image with the label added to the bottom right corner.
+    """
+    label_size = (screensaver.size[0] - coordinates[0], screensaver.size[1] - coordinates[1])
+    label = Image.new('RGBA', label_size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(label)
+    text = f'{datetime.datetime.now().year}'
+    font_size = calculate_font_size(text, label_size, 'Inkfree.ttf')
+    font = ImageFont.truetype("Inkfree.ttf", font_size)  # Adjust the font as needed
+    _, _, text_width, text_height = draw.textbbox((0, 0), text, font=font)
+    text_x = (label_size[0] - text_width) // 2
+    text_y = (label_size[1] - text_height) // 2
+    draw.text((text_x, text_y), text, font=font, fill='#575757')
+
+    screensaver.paste(label, coordinates)
+    return screensaver
+
+
 def add_images_to_screensaver(screensaver_template, cover_images, header_size: int = 0, full_screen: bool = False):
     """
     :param full_screen: If True, some books will be cut off for a full screen. Otherwise, there will be half-empty rows.
@@ -148,11 +190,14 @@ def add_images_to_screensaver(screensaver_template, cover_images, header_size: i
     # Resize the cover images to fit the cells
     cover_images = [img.resize((cell_width, cell_height)) for img in cover_images]
     # Add the cover images to the screensaver
+    x = y = 0
     for i, img in enumerate(cover_images):
         x = (i % columns) * (cell_width + padding)
         y = header_size + (i // columns) * (cell_height + padding)
         screensaver.paste(img, (x, y), img)
 
+    if screensaver.size[0] - x > cell_width:
+        screensaver = add_label(screensaver, (x + cell_width, y))
     return screensaver
 
 
@@ -215,7 +260,7 @@ def main():
     # Add the cover images to the screensaver template add a header size if needed
     print('Adding cover images to the screensaver template...', flush=True)
     screensaver: Image = add_images_to_screensaver(screensaver_template, cover_images, header_size=0)
-    
+
     # Save the screensaver to the Kobo
     save_screensaver(screensaver, kobo_drive)
     print('Screensaver saved to Kobo.', flush=True)
