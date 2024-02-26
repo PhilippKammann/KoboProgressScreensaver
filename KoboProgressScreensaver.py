@@ -172,50 +172,50 @@ def main():
     # Get the drive letter of the Kobo eReader
     kobo_drive: str = get_kobo_drive_letter()
     if not kobo_drive:
-        print('Kobo eReader not connected.')
+        print('Kobo eReader not connected.', flush=True)
         os.system('pause')
         return
-    print(f'Kobo eReader found at {kobo_drive}')
+    print(f'Kobo eReader found at {kobo_drive}', flush=True)
 
     # Get the image IDs of recently read books
     read_books: List[str] = get_recently_read_book_image_ids(kobo_drive)
     if not read_books:
-        print('No recently read books found.')
+        print('No recently read books found.', flush=True)
         os.system('pause')
         return
-    print(f'{len(read_books)} recently read books found.')
+    print(f'{len(read_books)} recently read books found.', flush=True)
 
     # Collect the cover images of recently read books
     cover_images: List = [collect_image_from_id(kobo_drive, image_id) for image_id in read_books]
     # Filter out not found images
     cover_images = [img for img in cover_images if img]
     if not cover_images:
-        print('No cover images found.')
+        print('No cover images found.', flush=True)
         os.system('pause')
         return
-    print(f'{len(cover_images)} cover images found.')
+    print(f'{len(cover_images)} cover images found.', flush=True)
 
     # Grayscale the images
-    print('Grayscaling the images...')
+    print('Grayscaling the images...', flush=True)
     cover_images = [ImageOps.grayscale(img).convert('RGBA') for img in cover_images]
 
     # Get the screen size of the Kobo eReader
     screen_size: Tuple[int, int] = get_kobo_screen_size(kobo_drive)
 
     # Resize the images to fit the screen aspect ratio (keep width, adjust height) for uniform look
-    print('Resizing the images...')
+    print('Resizing the images...', flush=True)
     cover_images = [img.resize((img.width, img.width * screen_size[1] // screen_size[0])) for img in cover_images]
 
     # Create screensaver template
     screensaver_template: Image = generate_screensaver_template(screen_size)
 
     # Add the cover images to the screensaver template add a header size if needed
-    print('Adding cover images to the screensaver template...')
+    print('Adding cover images to the screensaver template...', flush=True)
     screensaver: Image = add_images_to_screensaver(screensaver_template, cover_images, header_size=0)
     
     # Save the screensaver to the Kobo
     save_screensaver(screensaver, kobo_drive)
-    print('Screensaver saved to Kobo.')
+    print('Screensaver saved to Kobo.', flush=True)
 
 
 if __name__ == '__main__':
