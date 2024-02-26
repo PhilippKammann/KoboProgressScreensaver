@@ -98,7 +98,7 @@ def find_image_path(drive_letter: str, image_id: str) -> Optional[str]:
     return file_path
 
 
-def collect_image_from_id(drive_letter: str, image_id: str) -> Optional[Image]:
+def collect_image_from_id(drive_letter: str, image_id: str):
     """
     Collects an image based on the drive letter and image ID.
 
@@ -112,7 +112,7 @@ def collect_image_from_id(drive_letter: str, image_id: str) -> Optional[Image]:
     return None
 
 
-def generate_screensaver_template(screen_size: Tuple[int, int]) -> Image:
+def generate_screensaver_template(screen_size: Tuple[int, int]):
     """
     Generate the background for the screensaver. Currently, it just generates a static noise effect.
     :param screen_size: A tuple representing the dimensions of the screensaver image. It should contain two integers,
@@ -123,7 +123,7 @@ def generate_screensaver_template(screen_size: Tuple[int, int]) -> Image:
     return screensaver.convert('RGBA')
 
 
-def add_images_to_screensaver(screensaver_template: Image, cover_images: List[Image], header_size: int = 0) -> Image:
+def add_images_to_screensaver(screensaver_template, cover_images, header_size: int = 0):
     """
     :param screensaver_template: The base template image of the screensaver.
     :param cover_images: A list of cover images to be added to the screensaver.
@@ -186,7 +186,7 @@ def main():
     print(f'{len(read_books)} recently read books found.')
 
     # Collect the cover images of recently read books
-    cover_images: List[Image] = [collect_image_from_id(kobo_drive, image_id) for image_id in read_books]
+    cover_images: List = [collect_image_from_id(kobo_drive, image_id) for image_id in read_books]
     # Filter out not found images
     cover_images = [img for img in cover_images if img]
     if not cover_images:
