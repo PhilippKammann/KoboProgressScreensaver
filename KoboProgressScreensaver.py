@@ -163,6 +163,7 @@ def save_screensaver(screensaver, kobo_drive):
     The saved file will have the format '<year>Progress.png', where 'year' is the current year.
     The screensaver image should be in PNG format.
     """
+    os.makedirs(os.path.join(kobo_drive, '.kobo', 'screensaver'), exist_ok=True)
     screensaver_path = os.path.join(kobo_drive, '.kobo', 'screensaver', f'{datetime.datetime.now().year}Progress.png')
     screensaver.save(screensaver_path, 'PNG')
 
