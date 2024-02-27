@@ -11,7 +11,9 @@ It then generates the screensaver as a png-file in the Kobo's screensaver folder
 <img src="2024Progress.png" alt="">
 
 ## Usage
-``python kobo_progress_screensaver.py`` <br>
+1. Connect your Kobo erader
+2. ``python kobo_progress_screensaver.py``
+   
 That's it. The script will do the rest. Otherwise, it will tell you what went wrong and you can complain 
 in an issue about it to me.
 
