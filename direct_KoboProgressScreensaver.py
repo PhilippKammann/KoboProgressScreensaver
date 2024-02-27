@@ -192,7 +192,9 @@ def add_images_to_screensaver(screensaver_template, cover_images, header_size: i
         screensaver.paste(img, (x, y), img)
 
     if screensaver.size[0] - x > cell_width:
-        screensaver = add_label(screensaver, (x + cell_width, y))
+        pass
+        # Problem with missing font file on MacOS and Linux
+        # screensaver = add_label(screensaver, (x + cell_width, y))
     return screensaver
 
 
