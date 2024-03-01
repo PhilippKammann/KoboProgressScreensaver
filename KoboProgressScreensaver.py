@@ -180,6 +180,8 @@ def add_images_to_screensaver(screensaver_template, cover_images, header_size: i
     # Calculate the number of columns and rows
     columns = math.ceil(math.sqrt(total_images))
     rows = math.ceil(total_images / columns)
+    if total_images == 2:
+        rows += 1
     if full_screen:
         rows = math.floor(total_images / columns)
     # Calculate the width and height of each cell
