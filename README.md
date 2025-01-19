@@ -17,6 +17,7 @@ It then generates the screensaver as a png-file in the Kobo's screensaver folder
    1. Run the ``KoboProgressScreensaver.exe`` file.<br>
    OR
    2. ``python kobo_progress_screensaver.py``
+3. Select your device type when prompted
    
 That's it. The script will do the rest. Otherwise, it will tell you what went wrong, and you can complain 
 in an issue about it to me.

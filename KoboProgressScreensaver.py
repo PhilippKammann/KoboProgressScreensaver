@@ -21,21 +21,34 @@ def get_kobo_drive_letter() -> Optional[str]:
     return None
 
 
-def get_kobo_screen_size(drive_letter: str) -> Tuple[int, int]:
+def get_kobo_screen_size(drive_letter: str) -> Tuple[int, int, bool]:
     """
-    If someone can figure out how to get the screen size from the Kobo dynamically, that would be great.
-    For now, I'm just going to hardcode the screen size of the Kobo Clara 2e.
-    The size should also work for other readers.
-    Uncomment the return statement for your reader, if you know the screen size.
-    Remember to comment out the unneeded return statement.
+    Get the screen size of the Kobo eReader based on user selection.
+
+    :param drive_letter: The drive letter of the Kobo eReader.
+    :return: A tuple containing the width, height, and grayscale flag of the Kobo eReader.
     """
-    return 1072, 1448  # Kobo Clara 2e
-    # return 1440, 1920  # Kobo Forma
-    # return 1264, 1690  # Kobo Libra H2O
-    # return 758 , 1024  # Kobo Nia
-    # return 1264, 1680  # Kobo Libra 2
-    # return 1440, 1920  # Kobo Sage
-    # return 1404, 1872  # Kobo Elipsa 2E
+    devices = {
+        # Device: (width, height, grayscale)
+        "Kobo Clara 2e": (1072, 1448, True),
+        "Kobo Clara Color": (1072, 1448, False),
+        "Kobo Forma": (1440, 1920, True),
+        "Kobo Libra H2O": (1264, 1690, True),
+        "Kobo Nia": (758, 1024, True),
+        "Kobo Libra 2": (1264, 1680, True),
+        "Kobo Libra Color": (1264, 1680, False),
+        "Kobo Sage": (1440, 1920, True),
+        "Kobo Elipsa 2E": (1404, 1872, True)
+    }
+
+    print("Select your Kobo device:")
+    for i, device in enumerate(devices.keys(), 1):
+        print(f"{i}. {device}")
+
+    choice = int(input("Enter the number corresponding to your device: ")) - 1
+    selected_device = list(devices.values())[choice]
+
+    return selected_device
 
 
 def get_recently_read_book_image_ids(drive_letter: str) -> List[str]:
@@ -89,7 +102,7 @@ def find_image_path(drive_letter: str, image_id: str) -> Optional[str]:
     # Walk through directory and its subfolders
     for root, dirs, files in os.walk(search_dir):
         for file in files:
-            if file.endswith("N3_LIBRARY_GRID.parsed") and file.startswith(image_id):
+            if file.endswith("N3_FULL.parsed") and file.startswith(image_id):
                 file_path = os.path.join(root, file)
                 break
         if file_path:
@@ -245,12 +258,14 @@ def main():
         return
     print(f'{len(cover_images)} cover images found.', flush=True)
 
-    # Grayscale the images
-    print('Grayscaling the images...', flush=True)
-    cover_images = [ImageOps.grayscale(img).convert('RGBA') for img in cover_images]
-
     # Get the screen size of the Kobo eReader
-    screen_size: Tuple[int, int] = get_kobo_screen_size(kobo_drive)
+    x, y, grayscale = get_kobo_screen_size(kobo_drive)
+    screen_size = (x, y)
+
+    if grayscale:
+        # Grayscale the images
+        print('Grayscaling the images...', flush=True)
+        cover_images = [ImageOps.grayscale(img).convert('RGBA') for img in cover_images]
 
     # Resize the images to fit the screen aspect ratio (keep width, adjust height) for uniform look
     print('Resizing the images...', flush=True)
