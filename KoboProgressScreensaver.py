@@ -75,7 +75,10 @@ def get_recently_read_book_image_ids(drive_letter: str) -> List[str]:
         cursor = kobo_db_conn.cursor()
         cursor.execute("SELECT imageID "
                        "FROM content "
-                       "WHERE ReadStatus = 2 AND DateLastRead > datetime('now', 'start of year')"
+                       "WHERE "
+                       "    ReadStatus = 2 AND "
+                       "    DateLastRead > datetime('now', 'start of year') AND "
+                       "    ___UserID != 'removed' "
                        "ORDER BY DateLastRead DESC;")
         for row in cursor:
             read_books.append(row[0])
